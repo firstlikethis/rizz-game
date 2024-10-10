@@ -1,0 +1,182 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/x-icon" href="img/favicon.ico">
+    <title>เล่นกานนนนน</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #ffe6e6;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+            transition: background-color 0.5s;
+        }
+        .container {
+            text-align: center;
+            background-color: rgba(255, 240, 245, 0.8);
+            padding: 20px;
+            border-radius: 15px;
+            box-shadow: 0 0 10px rgba(255, 105, 180, 0.3);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .container:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 20px rgba(255, 105, 180, 0.5);
+        }
+        select {
+            font-size: 16px;
+            padding: 5px;
+            margin-top: 10px;
+            border: 2px solid #ff69b4;
+            border-radius: 5px;
+            background-color: #fff0f5;
+            transition: all 0.3s;
+        }
+        select:hover {
+            background-color: #ffe6e6;
+        }
+        img {
+            max-width: 100%;
+            height: auto;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            display: none;
+            transition: transform 0.5s;
+        }
+        img:hover {
+            transform: scale(1.1);
+        }
+        .heart {
+            position: absolute;
+            font-size: 30px;
+            color: #ff69b4;
+            animation: heartFloat 4s infinite;
+            opacity: 0;
+        }
+        @keyframes heartFloat {
+            0%, 100% { transform: translate(0, 0) scale(1); opacity: 0; }
+            50% { transform: translate(var(--tx), var(--ty)) scale(1.5); opacity: 1; }
+        }
+        .title {
+            font-size: 24px;
+            color: #ff1493;
+            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
+            animation: titlePulse 2s infinite;
+        }
+        @keyframes titlePulse {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+        }
+    </style>
+</head>
+<body>
+    <img id="image" alt="ภาพโลก">
+    <div class="container">
+        <h2 class="title">เลือกแบบไล่ระดับน้าาา🥰</h2>
+        <select id="resolution">
+            <option value="">ลองดูจิ่</option>
+            <option value="144">144p</option>
+            <option value="480">480p</option>
+            <option value="720">720p</option>
+            <option value="1080">1080p HD</option>
+            <option value="2160">2160p 4K</option>
+        </select>
+    </div>
+
+    <audio id="backgroundMusic" loop>
+        <source src="audio/ink.mp3" type="audio/mpeg">
+    </audio>
+
+    <script>
+        const resolutionSelect = document.getElementById('resolution');
+        const image = document.getElementById('image');
+        const audio = document.getElementById('backgroundMusic');
+        const body = document.body;
+
+        const imagePaths = {
+            '144': 'img/1.png',
+            '480': 'img/2.png',
+            '720': 'img/3.png',
+            '1080': 'img/4.png',
+            '2160': 'img/cat.png'
+        };
+
+        const colors = {
+            '144': '#FFE6E6',
+            '480': '#FFD1DC',
+            '720': '#FFC0CB',
+            '1080': '#FFB6C1',
+            '2160': '#FFD1DC'
+        };
+
+        resolutionSelect.addEventListener('change', function() {
+            const resolution = this.value;
+            
+            if (resolution === '') {
+                image.style.display = 'none';
+                removeHearts();
+                audio.pause();
+                body.style.backgroundColor = '#ffe6e6';
+                return;
+            }
+
+            image.style.display = 'block';
+            body.style.backgroundColor = colors[resolution];
+            
+            if (resolution !== '2160') {
+                image.src = imagePaths[resolution];
+                image.alt = `ภาพโลกที่ความละเอียด ${resolution}p`;
+                removeHearts();
+                audio.pause();
+            } else {
+                image.src = imagePaths['2160'];
+                image.alt = 'ภาพของคุณที่ความละเอียด 4K';
+                createHearts();
+                audio.play();
+            }
+
+            // เพิ่มเอฟเฟกต์การปรากฏของรูปภาพ
+            image.style.opacity = '0';
+            image.style.transform = 'scale(0.8)';
+            setTimeout(() => {
+                image.style.opacity = '1';
+                image.style.transform = 'scale(1)';
+            }, 50);
+        });
+
+        function createHearts() {
+            removeHearts();
+            for (let i = 0; i < 300; i++) {
+                const heart = document.createElement('div');
+                heart.className = 'heart';
+                heart.style.left = `${Math.random() * 100}%`;
+                heart.style.top = `${Math.random() * 100}%`;
+                heart.style.setProperty('--tx', `${(Math.random() - 0.5) * 200}px`);
+                heart.style.setProperty('--ty', `${(Math.random() - 0.5) * 200}px`);
+                heart.style.animationDelay = `${Math.random() * 4}s`;
+                heart.innerHTML = '❤';
+                document.body.appendChild(heart);
+            }
+        }
+
+        function removeHearts() {
+            document.querySelectorAll('.heart').forEach(heart => heart.remove());
+        }
+
+        // เพิ่มเอฟเฟกต์ hover ให้กับ select
+        resolutionSelect.addEventListener('mouseover', function() {
+            this.style.transform = 'scale(1.1)';
+        });
+        resolutionSelect.addEventListener('mouseout', function() {
+            this.style.transform = 'scale(1)';
+        });
+    </script>
+</body>
+</html>
