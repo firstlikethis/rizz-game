@@ -1,182 +1,562 @@
 <!DOCTYPE html>
 <html lang="th">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link rel="icon" type="image/x-icon" href="img/favicon.ico">
-    <title>เล่นกานนนนน</title>
-    <style>
-        body {
-            font-family: 'Arial', sans-serif;
-            background-color: #ffe6e6;
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>เกมจีบสาว</title>
+        <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            height: 100%;
+            font-family: Arial, sans-serif;
+            overflow: hidden;
+            background-color: #ff69b4;
+        }
+        .screen {
+            width: 100%;
+            height: 100%;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            height: 100vh;
-            margin: 0;
-            overflow: hidden;
-            transition: background-color 0.5s;
-        }
-        .container {
             text-align: center;
-            background-color: rgba(255, 240, 245, 0.8);
-            padding: 20px;
-            border-radius: 15px;
-            box-shadow: 0 0 10px rgba(255, 105, 180, 0.3);
-            transition: transform 0.3s, box-shadow 0.3s;
-        }
-        .container:hover {
-            transform: scale(1.05);
-            box-shadow: 0 0 20px rgba(255, 105, 180, 0.5);
-        }
-        select {
-            font-size: 16px;
-            padding: 5px;
-            margin-top: 10px;
-            border: 2px solid #ff69b4;
-            border-radius: 5px;
-            background-color: #fff0f5;
-            transition: all 0.3s;
-        }
-        select:hover {
-            background-color: #ffe6e6;
-        }
-        img {
-            max-width: 100%;
-            height: auto;
-            border-radius: 10px;
-            margin-bottom: 20px;
-            display: none;
-            transition: transform 0.5s;
-        }
-        img:hover {
-            transform: scale(1.1);
-        }
-        .heart {
             position: absolute;
-            font-size: 30px;
-            color: #ff69b4;
-            animation: heartFloat 4s infinite;
+            top: 0;
+            left: 0;
+            transition: opacity 1s ease-in-out;
+        }
+        #start-screen {
+            background: linear-gradient(45deg, #ff69b4, #ff1493);
+            color: white;
+            opacity: 1;
+        }
+        #game-screen, #new-frame, #success-frame, #right-success-frame, #space-screen {
+            display: none;
             opacity: 0;
         }
-        @keyframes heartFloat {
-            0%, 100% { transform: translate(0, 0) scale(1); opacity: 0; }
-            50% { transform: translate(var(--tx), var(--ty)) scale(1.5); opacity: 1; }
+        .button {
+            padding: 10px 20px;
+            font-size: 18px;
+            cursor: pointer;
+            background-color: #ff1493;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            margin-top: 20px;
+            transition: all 0.3s;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.2);
         }
-        .title {
+        .button:hover {
+            transform: scale(1.05) translateY(-3px);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+        }.choices {
+            display: flex;
+            width: 100%;
+            height: 100%;
+            justify-content: space-around;
+            align-items: center;
+        }
+        .choice {
+            width: 200px;
+            height: 200px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
             font-size: 24px;
-            color: #ff1493;
-            text-shadow: 2px 2px 4px rgba(0,0,0,0.1);
-            animation: titlePulse 2s infinite;
+            color: white;
+            text-decoration: none;
+            position: relative;
+            transition: all 0.5s;
+            background-color: #ff69b4;
+            border-radius: 50%;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            overflow: hidden;
         }
-        @keyframes titlePulse {
-            0%, 100% { transform: scale(1); }
-            50% { transform: scale(1.05); }
+        .choice::before {
+            content: '❤️';
+            font-size: 100px;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            opacity: 0.5;
         }
+        .choice:hover {
+            transform: scale(1.1);
+        }
+        .choice:hover::before {
+            animation: heartBeat 1s infinite;
+        }
+        @keyframes heartBeat {
+            0% { transform: translate(-50%, -50%) scale(1); }
+            50% { transform: translate(-50%, -50%) scale(1.1); }
+            100% { transform: translate(-50%, -50%) scale(1); }
+        }
+        #new-frame {
+            display: none;
+            background: linear-gradient(45deg, #ff69b4, #ff1493);
+            color: white;
+        }
+        .content {
+            background-color: rgba(255, 255, 255, 0.2);
+            padding: 20px;
+            border-radius: 10px;
+            max-width: 80%;
+            backdrop-filter: blur(10px);
+        }
+        .password-input {
+            margin-top: 20px;
+            padding: 10px;
+            font-size: 18px;
+            border: none;
+            border-radius: 25px;
+            background-color: rgba(255, 255, 255, 0.3);
+            color: white;
+            text-align: center;
+            outline: none;
+            transition: all 0.3s;
+        }
+        .password-input::placeholder {
+            color: rgba(255, 255, 255, 0.7);
+        }
+        .password-input:focus {
+            background-color: rgba(255, 255, 255, 0.5);
+            box-shadow: 0 0 15px rgba(255, 255, 255, 0.5);
+        }
+        #space-screen {
+            display: none;
+            background: linear-gradient(45deg, #000013, #010134);
+            overflow: hidden;
+        }
+        .star {
+            position: absolute;
+            background-color: white;
+            width: 2px;
+            height: 2px;
+            border-radius: 50%;
+        }
+        .shooting-star {
+            position: absolute;
+            width: 4px;
+            height: 4px;
+            background-color: white;
+            border-radius: 50%;
+            animation: shootingStar 4s linear infinite;
+        }
+        @keyframes shootingStar {
+            0% { transform: translateX(-100%) translateY(100%); }
+            100% { transform: translateX(100%) translateY(-100%); }
+        }
+        #space-text {
+            position: absolute;
+            top: 10px;
+            right: 10px;
+            color: white;
+            font-size: 12px;
+            text-align: right;
+        }
+        
+        .heart-container {
+            width: 300px;
+            height: 300px;
+            background-color: white; /* กล่องข้อความเป็นสีขาว */
+            border-radius: 15px; /* ทำให้มุมโค้งมน */
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2); /* เงาให้ดูมีมิติ */
+            display: flex;
+            flex-direction: column; /* จัดเรียงเนื้อหาในแนวตั้ง */
+            justify-content: center;
+            align-items: center;
+            position: relative; /* ใช้สำหรับการวางตำแหน่งของข้อความ */
+            padding: 20px; /* เพิ่มระยะห่างภายใน */
+        }
+
+        .heart-image {
+            width: 150px; /* ขนาดรูปภาพ */
+            height: 150px; /* ขนาดรูปภาพ */
+            border-radius: 50%; /* ทำให้รูปภาพเป็นวงกลม */
+            object-fit: cover; /* ปรับให้รูปภาพเต็มวงกลม */
+            margin-bottom: 10px; /* ระยะห่างระหว่างรูปภาพและข้อความ */
+        }
+
+        #success-message {
+            color: #ff69b4; /* สีข้อความ */
+            font-size: 24px;
+            margin: 0; /* ปรับระยะขอบของข้อความ */
+        }
+
+
+        #final-button {
+            animation: bounce 1s infinite alternate;
+        }
+        @keyframes bounce {
+            from { transform: translateY(0); }
+            to { transform: translateY(-10px); }
+        }
+        .firework {
+            position: absolute;
+            width: 5px;
+            height: 5px;
+            border-radius: 50%;
+            animation: explode 1s ease-out forwards;
+        }
+        @keyframes explode {
+            0% { transform: scale(1); opacity: 1; }
+            100% { transform: scale(30); opacity: 0; }
+        }
+
+        #additional-text {
+            margin: 10px 0; /* Margin to separate paragraphs */
+            text-align: center; /* Center the text */
+            max-width: 600px; /* Limit the width for better readability */
+        }
+
+        .exit-button {
+            position: absolute; /* Absolute position for button */
+            bottom: 20px; /* Distance from the bottom */
+            left: 50%; /* Center horizontally */
+            transform: translateX(-50%); /* Offset by half its width */
+            padding: 10px 20px;
+            background-color: #ff4081; /* สีพื้นหลัง */
+            color: white; /* สีข้อความ */
+            border: none;
+            border-radius: 5px;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .exit-button:hover {
+            background-color: #e91e63; /* เปลี่ยนสีเมื่อชี้ */
+        }
+
     </style>
-</head>
-<body>
-    <img id="image" alt="ภาพโลก">
-    <div class="container">
-        <h2 class="title">เลือกแบบไล่ระดับน้าาา🥰</h2>
-        <select id="resolution">
-            <option value="">ลองดูจิ่</option>
-            <option value="144">144p</option>
-            <option value="480">480p</option>
-            <option value="720">720p</option>
-            <option value="1080">1080p HD</option>
-            <option value="2160">2160p 4K</option>
-        </select>
-    </div>
+    </head>
+    <body>
+        <div id="start-screen" class="screen">
+            <h1>เล่นกับผมหน่อยยย</h1>
+            <button id="start-button" class="button">เริ่มเลอ</button>
+        </div>
+        <div id="game-screen" class="screen">
+            <br>
+            <h2>คุณเลือกประตู<span id="chosen-door"></span></h2>
 
-    <audio id="backgroundMusic" loop>
-        <source src="audio/ink.mp3" type="audio/mpeg">
-    </audio>
+            <div class="choices">
 
-    <script>
-        const resolutionSelect = document.getElementById('resolution');
-        const image = document.getElementById('image');
-        const audio = document.getElementById('backgroundMusic');
-        const body = document.body;
+                <a href="#" id="left-choice" class="choice">ประตูซ้าย</a>
+                <a href="#" id="right-choice" class="choice">ประตูขวา</a>
+            </div>
+        </div>
+        <div id="new-frame" class="screen">
+            <div class="content">
+                <h2>คุณเลือกประตู<span id="chosen-door"></span></h2>
+                <p id="hint"></p>
+                <input type="text" id="password-input" class="password-input"
+                    placeholder="ใส่รหัสที่นี่">
+                <button id="submit-button" class="button">ยืนยัน</button>
+            </div>
+        </div>
+        <div id="success-frame" class="screen">
+            <div class="heart-container">
+                <img src="img/download.jpg" alt="Heart Image"
+                    class="heart-image">
+                <p id="success-message">งุ้ยยย เก่งจางงงง
+                    แต่ในนี้มันไม่มีอะไรเลย!</p>
+                <p id="success-message2" style="color:#ffff;">รหัสทางขวาคือ
+                    580</p>
+            </div>
+            <button id="back-button" class="button"
+                style="display: none;">กลับไปเลือกใหม่</button>
+        </div>
+        <div id="right-success-frame" class="screen">
+            <button id="final-button" class="button">จะกดเข้าไปจริงง่ะ</button>
+        </div>
+        <div id="space-screen" class="screen">
+            <p id="space-text">คุณได้เข้าสู่ห้วงอวกาศแห่งความรัก</p>
+            <p id="additional-text" style="color: #ffff;">เกมนี้อาจดูเหมือนไม่มีอะไรเลย แต่แท้จริงแล้วมันสะท้อนถึงความเป็นตัวตนของผม ทั้งสองฝั่งที่อยู่ซ้ายและขวา ฝั่งซ้ายคือความจริงใจที่ซ่อนอยู่ในกล่องสีขาว(รหัสของฝั่งขวา) ส่วนฝั่งขวาแทนโลกของผมที่ว่างเปล่า เมื่อมองรวมกัน เกมนี้ไม่ใช่แค่เกม แต่เป็นสัญลักษณ์ของความรู้สึกดีๆที่ผมมีต่อพี่</p>
+            <p id="additional-text" style="color: #ffff;">ผมรู้ว่าบางครั้งตัวเองอาจดูงี่เง่า ขี้นอยและมีความคิดที่แปลกๆ แต่โปรดอย่าโกรธหรือคิดอะไรไม่ดีเกี่ยวกับผมเลยนะ ผมแค่อยากให้รู้ว่าความรู้สึกนี้จริงใจที่สุด และมันคือทั้งหมดที่ผมมีให้พี่ 🥹</p>
+            <button id="exit-button" class="exit-button" style="display: none;">ออกจากเกม</button>
+        </div>
+        <audio id="background-music" loop>
+            <source src="audio/punpun.mp3" type="audio/mpeg">
+        </audio>
+        <script>
+        const startScreen = document.getElementById('start-screen');
+        const gameScreen = document.getElementById('game-screen');
+        const newFrame = document.getElementById('new-frame');
+        const successFrame = document.getElementById('success-frame');
+        const rightSuccessFrame = document.getElementById('right-success-frame');
+        const spaceScreen = document.getElementById('space-screen');
+        const chosenDoor = document.getElementById('chosen-door');
+        const hint = document.getElementById('hint');
+        const passwordInput = document.getElementById('password-input');
+        const submitButton = document.getElementById('submit-button');
+        const backButton = document.getElementById('back-button');
+        const finalButton = document.getElementById('final-button');
+        const backgroundMusic = document.getElementById('background-music');
 
-        const imagePaths = {
-            '144': 'img/1.png',
-            '480': 'img/2.png',
-            '720': 'img/3.png',
-            '1080': 'img/4.png',
-            '2160': 'img/cat.png'
-        };
+        document.addEventListener("DOMContentLoaded", () => {
+            const exitButton = document.getElementById('exit-button');
 
-        const colors = {
-            '144': '#FFE6E6',
-            '480': '#FFD1DC',
-            '720': '#FFC0CB',
-            '1080': '#FFB6C1',
-            '2160': '#FFD1DC'
-        };
-
-        resolutionSelect.addEventListener('change', function() {
-            const resolution = this.value;
-            
-            if (resolution === '') {
-                image.style.display = 'none';
-                removeHearts();
-                audio.pause();
-                body.style.backgroundColor = '#ffe6e6';
-                return;
-            }
-
-            image.style.display = 'block';
-            body.style.backgroundColor = colors[resolution];
-            
-            if (resolution !== '2160') {
-                image.src = imagePaths[resolution];
-                image.alt = `ภาพโลกที่ความละเอียด ${resolution}p`;
-                removeHearts();
-                audio.pause();
-            } else {
-                image.src = imagePaths['2160'];
-                image.alt = 'ภาพของคุณที่ความละเอียด 4K';
-                createHearts();
-                audio.play();
-            }
-
-            // เพิ่มเอฟเฟกต์การปรากฏของรูปภาพ
-            image.style.opacity = '0';
-            image.style.transform = 'scale(0.8)';
+            // แสดงปุ่มหลังจาก 10 วินาที
             setTimeout(() => {
-                image.style.opacity = '1';
-                image.style.transform = 'scale(1)';
-            }, 50);
-        });
+                if (exitButton) {
+                    exitButton.style.display = 'block'; // แสดงปุ่มหลังจาก 10 วินาที
+                }
+            }, 10000);
 
-        function createHearts() {
-            removeHearts();
-            for (let i = 0; i < 300; i++) {
-                const heart = document.createElement('div');
-                heart.className = 'heart';
-                heart.style.left = `${Math.random() * 100}%`;
-                heart.style.top = `${Math.random() * 100}%`;
-                heart.style.setProperty('--tx', `${(Math.random() - 0.5) * 200}px`);
-                heart.style.setProperty('--ty', `${(Math.random() - 0.5) * 200}px`);
-                heart.style.animationDelay = `${Math.random() * 4}s`;
-                heart.innerHTML = '❤';
-                document.body.appendChild(heart);
+            // ตรวจสอบว่าปุ่มมีอยู่และเมื่อกดปุ่ม
+            if (exitButton) {
+                exitButton.addEventListener('click', () => {
+                    alert('พี่เข้ามาอยู่ในใจผมนานแล้ว พี่ออกไม่ได้หรอกครับ');
+                });
             }
+        });
+        
+        document.getElementById('start-button').addEventListener('click', () => {
+            startScreen.style.opacity = '0';
+            setTimeout(() => {
+                startScreen.style.display = 'none';
+                gameScreen.style.display = 'flex';
+                gameScreen.style.opacity = '1';
+            }, 1000);
+        });
+
+        document.getElementById('left-choice').addEventListener('click', (e) => {
+            e.preventDefault();
+            showNewFrame('ซ้าย');
+            hint.textContent = "รหัสเปิดกล่องคือรหัสอะไรนะ วันเกิดพี่หรือเปล่านะ!?";
+        });
+
+        document.getElementById('right-choice').addEventListener('click', (e) => {
+            e.preventDefault();
+            showNewFrame('ขวา');
+            hint.textContent = "รหัสเปิดกล่องคือรหัสอะไรนะ เบอร์โทรศัพท์หลักที่ 3 หลักที่ 7 หลักที่ 9 ของพี่หรือเปล่านะ!?";
+        });
+
+        submitButton.addEventListener('click', () => {
+            const password = passwordInput.value.toLowerCase();
+            if (chosenDoor.textContent === 'ซ้าย' && ['9', '09', 'วันเสาร์', 'เสาร์'].includes(password)) {
+                showSuccessFrame();
+            } else if (chosenDoor.textContent === 'ขวา' && password === '580') {
+                showRightSuccessFrame();
+            } else {
+                alert('รหัสไม่ถูกต้อง ลองใหม่นะ!');
+            }
+        });
+
+        backButton.addEventListener('click', () => {
+            successFrame.style.opacity = '0';
+            setTimeout(() => {
+                successFrame.style.display = 'none';
+                gameScreen.style.display = 'flex';
+                gameScreen.style.opacity = '1';
+            }, 1000);
+        });
+
+        finalButton.addEventListener('click', () => {
+            backgroundMusic.play();
+            showSpaceScreen();
+        });
+
+        function showNewFrame(door) {
+            chosenDoor.textContent = door;
+            gameScreen.style.opacity = '0';
+            setTimeout(() => {
+                gameScreen.style.display = 'none';
+                newFrame.style.display = 'flex';
+                newFrame.style.opacity = '1';
+            }, 1000);
         }
 
-        function removeHearts() {
-            document.querySelectorAll('.heart').forEach(heart => heart.remove());
+        function showSuccessFrame() {
+            newFrame.style.opacity = '0';
+            setTimeout(() => {
+                newFrame.style.display = 'none';
+                successFrame.style.display = 'flex';
+                successFrame.style.opacity = '1';
+                createFireworks();
+                setTimeout(() => {
+                    backButton.style.display = 'block';
+                }, 3000);
+            }, 1000);
         }
 
-        // เพิ่มเอฟเฟกต์ hover ให้กับ select
-        resolutionSelect.addEventListener('mouseover', function() {
-            this.style.transform = 'scale(1.1)';
-        });
-        resolutionSelect.addEventListener('mouseout', function() {
-            this.style.transform = 'scale(1)';
-        });
+        function showRightSuccessFrame() {
+            newFrame.style.opacity = '0';
+            setTimeout(() => {
+                newFrame.style.display = 'none';
+                rightSuccessFrame.style.display = 'flex';
+                rightSuccessFrame.style.opacity = '1';
+            }, 1000);
+        }
+
+        function showSpaceScreen() {
+            rightSuccessFrame.style.opacity = '0';
+            setTimeout(() => {
+                rightSuccessFrame.style.display = 'none';
+                spaceScreen.style.display = 'flex';
+                spaceScreen.style.opacity = '1';
+                createStars();
+                setInterval(createShootingStar, 4000);
+            }, 1000);
+        }
+        function createStars() {
+    for (let i = 0; i < 200; i++) {
+        const star = document.createElement('div');
+        star.className = 'star';
+        star.style.left = `${Math.random() * 100}%`;
+        star.style.top = `${Math.random() * 100}%`;
+        star.style.width = `${Math.random() * 3 + 1}px`; // ขนาดดาวสุ่ม
+        star.style.height = star.style.width; // ทำให้ดาวเป็นวงกลม
+        spaceScreen.appendChild(star);
+    }
+}
+
+function createShootingStar() {
+    const shootingStar = document.createElement('div');
+    shootingStar.className = 'shooting-star';
+    shootingStar.style.left = Math.random() < 0.5 ? '-10%' : '100%'; // สุ่มจากซ้ายหรือขวา
+    shootingStar.style.top = `${Math.random() * 100}%`;
+
+    // เส้นที่ตามหลังดาวตก
+    const tail = document.createElement('div');
+    tail.className = 'shooting-tail';
+    tail.style.left = shootingStar.style.left;
+    tail.style.top = shootingStar.style.top;
+    tail.style.width = '5px'; // ขนาดของหาง
+    tail.style.height = '10px'; // ขนาดของหาง
+    tail.style.transition = 'width 2.5s, opacity 2.5s'; // ให้หางมีการเปลี่ยนแปลง
+    tail.style.opacity = 1; // เริ่มต้นที่มองเห็นได้
+    spaceScreen.appendChild(tail);
+    spaceScreen.appendChild(shootingStar);
+
+    // เริ่มแอนิเมชัน
+    setTimeout(() => {
+        shootingStar.style.animation = 'shoot 5.5s ease-in forwards'; // เปลี่ยนเวลาที่นี่
+        tail.style.animation = 'fadeOut 5.5s ease-in forwards'; // เปลี่ยนเวลาที่นี่
+        tail.style.width = '20px'; // ขยายหางเมื่อเคลื่อนที่
+        tail.style.opacity = 0; // เฟดออก
+    }, 0);
+
+    // ลบดาวตกและเส้นหลังจากแอนิเมชันเสร็จสิ้น
+    setTimeout(() => {
+        spaceScreen.removeChild(shootingStar);
+        spaceScreen.removeChild(tail);
+    }, 10000); // ต้องการให้ลบหลังจาก 10 วินาที
+}
+
+// ฟังก์ชันเพื่อสร้างดาวตกทุก 5 วินาที
+setInterval(() => {
+    createShootingStar();
+}, 2000);
+
+function createFireworks() {
+    for (let i = 0; i < 50; i++) {
+        setTimeout(() => {
+            const firework = document.createElement('div');
+            firework.className = 'firework';
+            firework.style.left = `${Math.random() * 100}%`;
+            firework.style.top = `${Math.random() * 100}%`;
+            firework.style.backgroundColor = `hsl(${Math.random() * 360}, 100%, 50%)`;
+            firework.style.animation = `explode 1s ease-out forwards`;
+            document.body.appendChild(firework);
+            setTimeout(() => {
+                document.body.removeChild(firework);
+            }, 1000);
+        }, Math.random() * 2000);
+    }
+}
+
+// เรียกใช้งานฟังก์ชันเพื่อสร้างดาวและดอกไม้ไฟ
+createStars();
+createFireworks();
+
+// CSS สำหรับดาวตกและดอกไม้ไฟ
+const style = document.createElement('style');
+style.innerHTML = `
+    #space-screen {
+        position: relative;
+        width: 100vw;
+        height: 100vh;
+        overflow: hidden; /* ป้องกันไม่ให้ดาวตกออกนอกจอ */
+        background-color: black; /* สีพื้นหลัง */
+    }
+
+    .star {
+        position: absolute;
+        background-color: white; /* สีดาว */
+        border-radius: 50%;
+        animation: twinkle 1.5s infinite alternate; /* เอฟเฟกต์กระพริบ */
+    }
+
+    .shooting-star {
+        position: absolute;
+        width: 2px;
+        height: 10px;
+        background-color: white; /* สีดาวตก */
+        border-radius: 50%;
+        animation: shoot 5.5s ease-in forwards; /* เปลี่ยนเป็น 5.5 วินาที */
+    }
+
+    .shooting-tail {
+        position: absolute;
+        background-color: rgba(255, 255, 255, 0.5); /* สีของเส้น */
+        animation: fadeOut 5.5s ease-in forwards; /* เปลี่ยนเป็น 5.5 วินาที */
+    }
+
+    @keyframes shoot {
+        0% {
+            transform: translateY(-50px) translateX(0);
+        }
+        50% {
+            transform: translateY(0) translateX(50px); /* ควบคุมเส้นทางโค้ง */
+        }
+        100% {
+            transform: translateY(100vh) translateX(100vw); /* เคลื่อนที่ลงด้านล่าง */
+            opacity: 0; /* ลดความทึบ */
+        }
+    }
+
+    @keyframes fadeOut {
+        0% {
+            opacity: 1;
+        }
+        100% {
+            opacity: 0; /* เฟดออก */
+        }
+    }
+
+    @keyframes twinkle {
+        0% {
+            opacity: 0.5;
+        }
+        100% {
+            opacity: 1;
+        }
+    }
+
+    .firework {
+        position: absolute;
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        animation: explode 1s ease-out forwards;
+    }
+
+    @keyframes explode {
+        0% {
+            transform: scale(1);
+        }
+        100% {
+            transform: scale(5);
+            opacity: 0;
+        }
+`;
+document.head.appendChild(style);
+
+createStars();
+
     </script>
-</body>
+    </body>
 </html>
